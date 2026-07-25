@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-lab-dark text-white antialiased;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.glass {
+  @apply bg-white/5 backdrop-blur-xl border border-white/10;
+}
+
+.glow-text {
+  text-shadow: 0 0 12px rgba(34, 211, 238, 0.6);
+}
+
+/* Simple focus ring for keyboard navigation accessibility */
+:focus-visible {
+  outline: 2px solid #22d3ee;
+  outline-offset: 2px;
+}
