@@ -46,7 +46,7 @@ export default function DigitInput({
   } else if (isError) {
     stateClasses = 'border-red-500 bg-red-50 text-red-700 focus:ring-red-200'
   }
-  
+
   if (readOnly) {
     stateClasses = 'border-transparent bg-transparent text-gray-800'
   }
@@ -56,7 +56,7 @@ export default function DigitInput({
       ref={inputRef}
       type="text"
       inputMode="numeric"
-      pattern="[0-9]*"
+      pattern="[1-9]*"
       maxLength={2}
       value={value || ''}
       onChange={handleChange}
