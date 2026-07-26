@@ -24,3 +24,28 @@ body {
   outline: 2px solid #22d3ee;
   outline-offset: 2px;
 }
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .printable-container, .printable-container * {
+    visibility: visible;
+  }
+  .printable-container {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-area {
+    width: 100% !important;
+    max-width: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+}

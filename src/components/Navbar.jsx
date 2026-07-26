@@ -9,6 +9,7 @@ const links = [
   { to: '/', label: 'Home' },
   { to: '/simulations', label: 'Simulations' },
   { to: '/compare', label: 'Compare' },
+  { to: '/math', label: 'Mathematics' },
   { to: '/activity', label: 'Activity' },
   { to: '/achievements', label: 'Achievements' },
   { to: '/about', label: 'About' },

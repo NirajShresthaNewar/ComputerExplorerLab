@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { CloudRain, Waves, Dna, Rocket } from 'lucide-react'
 import ControlPanel from '../components/ControlPanel'
 import InfoPanel from '../components/InfoPanel'
+import SuperVisualizer from '../components/SuperVisualizer'
 import { computerTypes } from '../data/computerData'
 
 const simulations = [
@@ -66,20 +67,7 @@ export default function SuperSimulator() {
             <p className="text-[10px] text-gray-500 mb-2 font-mono">
               CLUSTER STATUS — 65,536 CORES ACROSS 512 NODES
             </p>
-            <div className="grid grid-cols-6 gap-1.5 mb-4">
-              {Array.from({ length: GRID_SIZE }).map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="aspect-square rounded-sm"
-                  animate={{
-                    backgroundColor: activeNodes.includes(i)
-                      ? 'rgba(34,211,238,0.9)'
-                      : 'rgba(255,255,255,0.08)',
-                  }}
-                  transition={{ duration: 0.15 }}
-                />
-              ))}
-            </div>
+            <SuperVisualizer simulation={simulation} isPlaying={isPlaying} speed={speed} />
             <div className="flex items-center gap-2 text-sm text-gray-300 mb-2">
               <ActiveIcon size={18} className="text-lab-cyan" aria-hidden="true" />
               Running: {simulations.find((s) => s.id === simulation).label}

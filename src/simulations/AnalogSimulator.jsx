@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import ControlPanel from '../components/ControlPanel'
 import InfoPanel from '../components/InfoPanel'
 import GaugeDial from '../components/GaugeDial'
+import VerticalThermometer from '../components/VerticalThermometer'
 import { computerTypes } from '../data/computerData'
 
 const DEVICES = [
@@ -60,15 +61,24 @@ export default function AnalogSimulator() {
 
           {/* Realistic instrument panel housing */}
           <div className="bg-gradient-to-b from-slate-800 to-slate-900 rounded-2xl p-6 border border-slate-700 shadow-inner">
-            <GaugeDial
-              value={value}
-              min={device.min}
-              max={device.max}
-              unit={device.unit}
-              label={device.label}
-              majorStep={device.majorStep}
-              redlineFrom={device.redlineFrom}
-            />
+            {deviceId === 'thermometer' ? (
+              <VerticalThermometer
+                value={value}
+                min={device.min}
+                max={device.max}
+                unit={device.unit}
+              />
+            ) : (
+              <GaugeDial
+                value={value}
+                min={device.min}
+                max={device.max}
+                unit={device.unit}
+                label={device.label}
+                majorStep={device.majorStep}
+                redlineFrom={device.redlineFrom}
+              />
+            )}
           </div>
 
           <label htmlFor="analog-slider" className="text-sm text-gray-400 mt-4 mb-2 block">

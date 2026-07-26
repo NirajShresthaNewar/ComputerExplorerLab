@@ -8,6 +8,7 @@ import Activity from './pages/Activity'
 import Achievements from './pages/Achievements'
 import About from './pages/About'
 import AchievementToast from './components/AchievementToast'
+import MathModule from './pages/MathModule'
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
           <Route path="/activity" element={<Activity />} />
           <Route path="/achievements" element={<Achievements />} />
           <Route path="/about" element={<About />} />
+          <Route path="/math" element={<MathModule />} />
         </Routes>
       </main>
       <Footer />
