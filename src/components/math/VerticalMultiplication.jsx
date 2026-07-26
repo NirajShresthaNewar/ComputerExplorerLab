@@ -8,7 +8,7 @@ export default function VerticalMultiplication() {
   const [allowCarry, setAllowCarry] = useState(true)
   const [num1, setNum1] = useState(0)
   const [num2, setNum2] = useState(0)
-  
+
   // userInputs can be an array of arrays. One for each row.
   // For 2x1: 1 intermediate row (which is also the final answer) -> 1 row of inputs
   // For 2x2: 2 intermediate rows + 1 final answer -> 3 rows of inputs
@@ -44,9 +44,9 @@ export default function VerticalMultiplication() {
   const hasCarry = (n1, n2) => {
     const s1 = n1.toString().split('').map(Number).reverse()
     const s2 = n2.toString().split('').map(Number).reverse()
-    
+
     const intermediateRows = []
-    
+
     for (let i = 0; i < s2.length; i++) {
       const d2 = s2[i]
       let rowValues = Array(i).fill(0)
@@ -57,12 +57,12 @@ export default function VerticalMultiplication() {
       }
       intermediateRows.push(rowValues)
     }
-    
+
     let maxLen = 0
     for (const row of intermediateRows) {
       if (row.length > maxLen) maxLen = row.length
     }
-    
+
     for (let col = 0; col < maxLen; col++) {
       let sum = 0
       for (const row of intermediateRows) {
@@ -70,7 +70,7 @@ export default function VerticalMultiplication() {
       }
       if (sum > 9) return true // Carry during addition
     }
-    
+
     return false
   }
 
@@ -87,33 +87,37 @@ export default function VerticalMultiplication() {
     while (!valid && attempts < 1000) {
       n1 = Math.floor(Math.random() * (max1 - min1 + 1)) + min1
       n2 = Math.floor(Math.random() * (max2 - min2 + 1)) + min2
-      
-      if (!allowCarry) {
-        if (!hasCarry(n1, n2)) valid = true
-      } else {
-        valid = true
+
+      const hasZero = n1.toString().includes('0') || n2.toString().includes('0')
+
+      if (!hasZero) {
+        if (!allowCarry) {
+          if (!hasCarry(n1, n2)) valid = true
+        } else {
+          valid = true
+        }
       }
       attempts++
     }
 
     if (!valid) {
-      // Fallback if no non-carry combination was found easily
+      // Fallback if no non-carry / no-zero combination was found easily
       n1 = parseInt('1'.repeat(digits1))
       n2 = parseInt('1'.repeat(digits2))
     }
 
     setNum1(n1)
     setNum2(n2)
-    
+
     const rows = calculateRows(n1, n2)
     setUserInputs(rows.map(r => Array(r.length + (rows.length > 1 ? 1 : 0)).fill(''))) // Add extra space for potential carry/offset alignment, but keep simple for now
-    
+
     // Better initialization
     const initialInputs = rows.map((r, i) => {
       // Final row might be longer
       let len = r.length
       if (i === rows.length - 1 && rows.length > 1) {
-         len = r.length
+        len = r.length
       }
       // For intermediate rows, we'll just require them to enter the digits they got.
       // E.g. 234 * 12 -> row 1: 468, row 2: 234 (they usually add a zero or leave blank, let's just ask for the non-zero digits for simplicity or full digits with zero).
@@ -176,7 +180,7 @@ export default function VerticalMultiplication() {
     const newInputs = userInputs.map((r, i) => i === rowIndex ? [...r] : r)
     newInputs[rowIndex][colIndex] = value
     setUserInputs(newInputs)
-    
+
     // Auto-advance logic (move left in the same row)
     if (value && colIndex < userInputs[rowIndex].length - 1) {
       setFocusedCol(colIndex + 1)
@@ -185,7 +189,7 @@ export default function VerticalMultiplication() {
       setFocusedRow(rowIndex + 1)
       setFocusedCol(0)
     }
-    
+
     setStatus('idle')
   }
 
@@ -245,12 +249,12 @@ export default function VerticalMultiplication() {
         status === 'correct'
           ? 'Perfect!'
           : status === 'error'
-          ? 'Check your intermediate rows and addition!'
-          : null
+            ? 'Check your intermediate rows and addition!'
+            : null
       }
     >
       <div className="flex flex-col md:flex-row gap-12 w-full justify-around items-start">
-        
+
         {/* Settings Panel */}
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 w-full md:w-1/3">
           <h3 className="font-bold text-gray-700 mb-4">Settings</h3>
@@ -267,7 +271,7 @@ export default function VerticalMultiplication() {
               />
               <div className="text-center text-sm font-bold text-blue-600 mb-4">{digits1} Digits</div>
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-600 mb-1">Bottom Number Digits</label>
               <input
@@ -283,9 +287,9 @@ export default function VerticalMultiplication() {
 
             <div className="p-3 bg-gray-50 rounded-xl border border-gray-200 mt-4">
               <label className="flex items-center gap-3 font-bold text-gray-700 cursor-pointer">
-                <input 
-                  type="checkbox" 
-                  checked={allowCarry} 
+                <input
+                  type="checkbox"
+                  checked={allowCarry}
                   onChange={(e) => setAllowCarry(e.target.checked)}
                   className="w-5 h-5 text-blue-600 rounded"
                 />
@@ -308,7 +312,7 @@ export default function VerticalMultiplication() {
                 <div key={`pad-${i}`} className="w-10"></div>
               ))}
             </div>
-            
+
             {/* Number 2 with operator */}
             <div className="flex flex-row-reverse gap-2 mb-2 justify-end relative">
               <div className="absolute -left-12 bottom-0 text-gray-500 font-bold">×</div>
@@ -320,16 +324,16 @@ export default function VerticalMultiplication() {
                 <div key={`pad2-${i}`} className="w-10"></div>
               ))}
             </div>
-            
+
             {/* Divider */}
             <div className="border-b-4 border-gray-800 mb-4 w-full h-1"></div>
-            
+
             {/* Input Rows */}
             <div className="flex flex-col gap-3 items-end">
               {userInputs.map((row, rIdx) => {
                 // If it's the final answer of a multi-step, add a divider before it
                 const isFinalAnswer = rIdx === userInputs.length - 1 && userInputs.length > 1
-                
+
                 return (
                   <div key={rIdx} className="flex flex-col items-end">
                     {isFinalAnswer && (
