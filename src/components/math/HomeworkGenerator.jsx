@@ -7,7 +7,7 @@ export default function HomeworkGenerator() {
     subtraction: { enabled: true, count: 5, digits1: 2, digits2: 2, carryMode: 'mix' },
     multiplication: { enabled: true, count: 4, digits1: 2, digits2: 1, carryMode: 'mix' },
     comparison: { enabled: false, count: 0 },
-    ordering: { enabled: false, count: 0 }
+    ordering: { enabled: false, count: 2, digits: 4, numbersPerQuestion: 5, mode: 'mix' }
   })
   
   const [worksheet, setWorksheet] = useState(null)
@@ -176,6 +176,10 @@ export default function HomeworkGenerator() {
           n1 = Math.floor(Math.random() * (max1 - min1 + 1)) + min1
           n2 = Math.floor(Math.random() * (max2 - min2 + 1)) + min2
           
+          // Reject numbers containing any 0 digit (e.g. 10, 20, 30, 101, 50)
+          const hasZeroDigit = n1.toString().includes('0') || n2.toString().includes('0')
+          if (hasZeroDigit) { attempts++; continue }
+
           if (config.multiplication.carryMode === 'no-carry') {
             if (!hasCarry(n1, n2)) valid = true
           } else if (config.multiplication.carryMode === 'carry') {
@@ -194,6 +198,43 @@ export default function HomeworkGenerator() {
         qs.push({ n1, n2, operator: '×', answer: n1 * n2 })
       }
       newWorksheet.push({ section: 'C', title: 'Multiplication', questions: qs, type: 'vertical' })
+    }
+
+    // Generate Ordering (Ascending / Descending)
+    if (config.ordering.enabled && config.ordering.count > 0) {
+      const qs = []
+      const digits = config.ordering.digits || 4
+      const perQ = config.ordering.numbersPerQuestion || 5
+      const maxNum = Math.pow(10, digits) - 1
+      const minNum = Math.pow(10, digits - 1)
+
+      for (let i = 0; i < config.ordering.count; i++) {
+        // Decide direction for this question
+        let direction
+        if (config.ordering.mode === 'ascending') {
+          direction = 'ascending'
+        } else if (config.ordering.mode === 'descending') {
+          direction = 'descending'
+        } else {
+          direction = i % 2 === 0 ? 'ascending' : 'descending'
+        }
+
+        // Generate unique random numbers
+        const nums = new Set()
+        let attempts = 0
+        while (nums.size < perQ && attempts < 2000) {
+          const n = Math.floor(Math.random() * (maxNum - minNum + 1)) + minNum
+          nums.add(n)
+          attempts++
+        }
+        const numberList = Array.from(nums)
+        const sorted = [...numberList].sort((a, b) => direction === 'ascending' ? a - b : b - a)
+
+        qs.push({ numbers: numberList, direction, answer: sorted })
+      }
+
+      const sectionLetter = String.fromCharCode(65 + newWorksheet.length) // next letter
+      newWorksheet.push({ section: sectionLetter, title: 'Arrange in Order', questions: qs, type: 'ordering' })
     }
 
     setWorksheet(newWorksheet)
@@ -376,6 +417,47 @@ export default function HomeworkGenerator() {
             )}
           </div>
 
+          {/* Ordering Settings */}
+          <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+            <label className="flex items-center gap-3 font-bold text-gray-700 mb-3 cursor-pointer">
+              <input 
+                type="checkbox" 
+                checked={config.ordering.enabled} 
+                onChange={e => setConfig({...config, ordering: {...config.ordering, enabled: e.target.checked}})}
+                className="w-5 h-5 text-purple-600 rounded"
+              />
+              Ordering (Asc / Desc)
+            </label>
+            {config.ordering.enabled && (
+              <div className="grid grid-cols-2 gap-4 pl-8">
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Questions</label>
+                  <input type="number" min="1" max="10" value={config.ordering.count || 2} onChange={e => setConfig({...config, ordering: {...config.ordering, count: parseInt(e.target.value)}})} className="w-full rounded border-gray-300 px-2 py-1" />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Digits</label>
+                  <select value={config.ordering.digits || 4} onChange={e => setConfig({...config, ordering: {...config.ordering, digits: parseInt(e.target.value)}})} className="w-full rounded border-gray-300 px-2 py-1">
+                    <option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Numbers per Q</label>
+                  <select value={config.ordering.numbersPerQuestion || 5} onChange={e => setConfig({...config, ordering: {...config.ordering, numbersPerQuestion: parseInt(e.target.value)}})} className="w-full rounded border-gray-300 px-2 py-1">
+                    <option value="4">4</option><option value="5">5</option><option value="6">6</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Direction</label>
+                  <select value={config.ordering.mode || 'mix'} onChange={e => setConfig({...config, ordering: {...config.ordering, mode: e.target.value}})} className="w-full rounded border-gray-300 px-2 py-1">
+                    <option value="mix">Mixed</option>
+                    <option value="ascending">Ascending Only</option>
+                    <option value="descending">Descending Only</option>
+                  </select>
+                </div>
+              </div>
+            )}
+          </div>
+
           <button 
             onClick={generateWorksheet}
             className="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-bold shadow-md transition-colors"
@@ -449,26 +531,52 @@ export default function HomeworkGenerator() {
               {worksheet.map((section, idx) => (
                 <div key={idx}>
                   <h3 className="text-xl font-bold mb-4 underline">SECTION {section.section}: {section.title}</h3>
-                  <div className={`grid grid-cols-3 ${isSidebarVisible ? 'lg:grid-cols-4' : 'lg:grid-cols-5 xl:grid-cols-6'} gap-y-8 gap-x-6`}>
-                    {section.questions.map((q, qIdx) => (
-                      <div key={qIdx} className="flex justify-center">
-                        <div className="font-mono text-2xl text-right">
-                          <div className="tracking-[0.5em]">{q.n1}</div>
-                          <div className="flex justify-end tracking-[0.5em]">
-                            <span className="mr-2">{q.operator}</span>
-                            <span>{q.n2}</span>
+                  
+                  {section.type === 'ordering' ? (
+                    /* Ordering Section Rendering */
+                    <div className="space-y-6">
+                      {section.questions.map((q, qIdx) => (
+                        <div key={qIdx} className="pl-4">
+                          <p className="text-lg font-semibold mb-2">
+                            {qIdx + 1}) Arrange in <span className="underline font-bold">{q.direction}</span> order:
+                          </p>
+                          <div className="flex flex-wrap gap-4 mb-3 text-xl font-mono">
+                            {q.numbers.map((n, nIdx) => (
+                              <span key={nIdx} className="px-3 py-1 border border-gray-400 rounded-lg bg-gray-50">{n}</span>
+                            ))}
                           </div>
-                          <div className="border-b-4 border-gray-800 w-full h-1 mt-1 mb-2"></div>
                           {showAnswers ? (
-                            <div className="tracking-[0.5em] text-red-600 font-bold">{q.answer}</div>
+                            <div className="text-lg font-mono text-red-600 font-bold">
+                              Ans: {q.answer.join(' , ')}
+                            </div>
                           ) : (
-                            // Reduced vertical space for smartboard visibility
-                            <div className="h-10"></div>
+                            <div className="border-b border-gray-400 w-3/4 h-8"></div>
                           )}
                         </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  ) : (
+                    /* Vertical Math Section Rendering */
+                    <div className={`grid grid-cols-3 ${isSidebarVisible ? 'lg:grid-cols-4' : 'lg:grid-cols-5 xl:grid-cols-6'} gap-y-8 gap-x-6`}>
+                      {section.questions.map((q, qIdx) => (
+                        <div key={qIdx} className="flex justify-center">
+                          <div className="font-mono text-2xl text-right">
+                            <div className="tracking-[0.5em]">{q.n1}</div>
+                            <div className="flex justify-end tracking-[0.5em]">
+                              <span className="mr-2">{q.operator}</span>
+                              <span>{q.n2}</span>
+                            </div>
+                            <div className="border-b-4 border-gray-800 w-full h-1 mt-1 mb-2"></div>
+                            {showAnswers ? (
+                              <div className="tracking-[0.5em] text-red-600 font-bold">{q.answer}</div>
+                            ) : (
+                              <div className="h-10"></div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

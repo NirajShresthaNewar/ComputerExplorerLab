@@ -88,9 +88,10 @@ export default function VerticalMultiplication() {
       n1 = Math.floor(Math.random() * (max1 - min1 + 1)) + min1
       n2 = Math.floor(Math.random() * (max2 - min2 + 1)) + min2
 
-      const hasTrailingZero = n1.toString().endsWith('0') || n2.toString().endsWith('0')
+      // Reject numbers containing any 0 digit (e.g. 10, 20, 30, 101, 50)
+      const hasZeroDigit = n1.toString().includes('0') || n2.toString().includes('0')
 
-      if (!hasTrailingZero) {
+      if (!hasZeroDigit) {
         if (!allowCarry) {
           if (!hasCarry(n1, n2)) valid = true
         } else {
