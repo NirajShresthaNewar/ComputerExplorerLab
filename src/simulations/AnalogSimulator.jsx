@@ -49,8 +49,8 @@ export default function AnalogSimulator() {
               <button
                 key={d.id}
                 onClick={() => setDeviceId(d.id)}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                  deviceId === d.id ? 'bg-lab-cyan text-lab-dark' : 'bg-white/5 text-gray-300 hover:bg-white/10'
+                className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                  deviceId === d.id ? 'bg-[var(--theme-accent)] text-slate-950 shadow-md font-bold' : 'bg-[var(--theme-border)] opacity-70 hover:opacity-100'
                 }`}
                 aria-pressed={deviceId === d.id}
               >
@@ -60,7 +60,7 @@ export default function AnalogSimulator() {
           </div>
 
           {/* Realistic instrument panel housing */}
-          <div className="bg-gradient-to-b from-slate-800 to-slate-900 rounded-2xl p-6 border border-slate-700 shadow-inner">
+          <div className="bg-[var(--theme-bg-panel)] rounded-2xl p-6 border border-[var(--theme-border)] shadow-inner">
             {deviceId === 'thermometer' ? (
               <VerticalThermometer
                 value={value}
@@ -81,7 +81,7 @@ export default function AnalogSimulator() {
             )}
           </div>
 
-          <label htmlFor="analog-slider" className="text-sm text-gray-400 mt-4 mb-2 block">
+          <label htmlFor="analog-slider" className="text-sm opacity-80 mt-4 mb-2 block font-medium">
             {deviceId === 'thermometer' ? 'Adjust ambient temperature' : 'Press the accelerator'}
           </label>
           <input
@@ -92,11 +92,11 @@ export default function AnalogSimulator() {
             step="0.5"
             value={value}
             onChange={(e) => setValue(Number(e.target.value))}
-            className="w-full accent-lab-cyan"
+            className="w-full accent-[var(--theme-accent)] cursor-pointer"
           />
-          <p className="text-xs text-gray-500 mt-2">
+          <p className="text-xs opacity-70 mt-2">
             Notice the needle moves smoothly through every value in between — that's what makes
-            this data <span className="text-lab-cyan">continuous</span>, unlike a digital display
+            this data <span className="text-[var(--theme-accent)] font-bold">continuous</span>, unlike a digital display
             that jumps between exact numbers.
           </p>
         </div>

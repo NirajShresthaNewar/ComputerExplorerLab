@@ -25,20 +25,20 @@ export default function InfoPanel({ data }) {
       className="glass rounded-2xl p-6"
     >
       <h3 className="text-2xl font-bold mb-1">{data.name}</h3>
-      <p className="text-sm text-gray-400 mb-5">{data.tagline}</p>
+      <p className="text-sm opacity-70 mb-5">{data.tagline}</p>
 
       <Section icon={BookOpen} title="Definition">
-        <p className="text-sm text-gray-300">{data.definition}</p>
+        <p className="text-sm opacity-90">{data.definition}</p>
       </Section>
 
       <Section icon={BookOpen} title="Working Principle">
-        <p className="text-sm text-gray-300">{data.workingPrinciple}</p>
+        <p className="text-sm opacity-90">{data.workingPrinciple}</p>
       </Section>
 
       <Section icon={CheckCircle2} title="Examples">
         <div className="flex flex-wrap gap-2">
           {data.examples.map((ex) => (
-            <span key={ex} className="px-3 py-1 rounded-full bg-white/5 text-xs text-gray-300">
+            <span key={ex} className="px-3 py-1 rounded-full bg-[var(--theme-border)] text-xs opacity-90 font-medium">
               {ex}
             </span>
           ))}
@@ -46,7 +46,7 @@ export default function InfoPanel({ data }) {
       </Section>
 
       {presentationMode ? (
-        <div className="mb-5 flex items-center gap-2 text-xs text-gray-500 italic p-3 rounded-lg bg-white/5">
+        <div className="mb-5 flex items-center gap-2 text-xs opacity-60 italic p-3 rounded-lg bg-[var(--theme-border)]">
           <EyeOff size={14} aria-hidden="true" />
           Advantages, disadvantages, and applications are hidden in presentation mode — ask the
           class before revealing (toggle presentation mode off to show).
@@ -54,27 +54,27 @@ export default function InfoPanel({ data }) {
       ) : (
         <>
           <Section icon={CheckCircle2} title="Advantages">
-            <ul className="text-sm text-gray-300 space-y-1">
+            <ul className="text-sm opacity-90 space-y-1">
               {data.advantages.map((a) => (
                 <li key={a} className="flex gap-2">
-                  <span className="text-green-400">+</span> {a}
+                  <span className="text-emerald-400 font-bold">+</span> {a}
                 </li>
               ))}
             </ul>
           </Section>
 
           <Section icon={XCircle} title="Disadvantages">
-            <ul className="text-sm text-gray-300 space-y-1">
+            <ul className="text-sm opacity-90 space-y-1">
               {data.disadvantages.map((d) => (
                 <li key={d} className="flex gap-2">
-                  <span className="text-red-400">−</span> {d}
+                  <span className="text-rose-400 font-bold">−</span> {d}
                 </li>
               ))}
             </ul>
           </Section>
 
           <Section icon={Briefcase} title="Applications">
-            <ul className="text-sm text-gray-300 space-y-1">
+            <ul className="text-sm opacity-90 space-y-1">
               {data.applications.map((a) => (
                 <li key={a}>• {a}</li>
               ))}
@@ -84,7 +84,7 @@ export default function InfoPanel({ data }) {
       )}
 
       <Section icon={Lightbulb} title="Fun Fact">
-        <p className="text-sm text-gray-300 italic">{data.funFact}</p>
+        <p className="text-sm opacity-90 italic">{data.funFact}</p>
       </Section>
     </motion.div>
   )

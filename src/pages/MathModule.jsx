@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { MathProvider } from '../context/MathContext'
 import AdditionSubtraction from '../components/math/AdditionSubtraction'
 import NumberComparison from '../components/math/NumberComparison'
@@ -17,35 +17,27 @@ const tabs = [
 ]
 
 export default function MathModule() {
-  const [activeTab, setActiveTab] = useState(tabs[0].id)
+  const [searchParams] = useSearchParams()
+  const tabParam = searchParams.get('tab') || 'add-sub'
 
-  const ActiveComponent = tabs.find((t) => t.id === activeTab)?.component || AdditionSubtraction
+  const activeTabObj = tabs.find((t) => t.id === tabParam) || tabs[0]
+  const ActiveComponent = activeTabObj.component
 
   return (
     <MathProvider>
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold text-center mb-8 text-white drop-shadow-md">
-          Class 3 Mathematics
-        </h1>
-        
-        {/* Navigation Tabs */}
-        <div className="flex flex-wrap justify-center gap-2 mb-8">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2 rounded-full font-medium transition-all duration-300 ${
-                activeTab === tab.id
-                  ? 'bg-blue-500 text-white shadow-lg scale-105'
-                  : 'bg-white/10 text-gray-300 hover:bg-white/20 hover:text-white'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
+      <div className="max-w-6xl mx-auto px-4 py-4">
+        <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/10">
+          <div>
+            <h1 className="text-3xl font-bold text-white drop-shadow-md">
+              Class 3 Mathematics
+            </h1>
+            <p className="text-sm text-gray-400 mt-1">
+              Active Module: <span className="text-lab-cyan font-semibold">{activeTabObj.label}</span>
+            </p>
+          </div>
         </div>
 
-        {/* Active Module Content */}
+        {/* Active Module Content - Submenu tabs removed from middle */}
         <div className="glass rounded-3xl p-6 min-h-[500px]">
           <ActiveComponent />
         </div>

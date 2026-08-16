@@ -122,7 +122,7 @@ export default function NumberComparison() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => handleNumberClick(num)}
-              className={`relative w-32 h-32 flex justify-center items-center bg-white rounded-2xl shadow-md border-4 text-3xl font-bold text-gray-700 transition-colors ${borderColor}`}
+              className={`relative w-32 h-32 flex justify-center items-center bg-[var(--theme-bg-card)] rounded-2xl shadow-xl border-4 text-3xl font-extrabold text-[var(--theme-text-main)] transition-colors ${borderColor}`}
             >
               {num}
               

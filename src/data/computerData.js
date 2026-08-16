@@ -160,6 +160,77 @@ export const computerTypes = {
     applications: ['Weather prediction', 'Space research', 'Medical research', 'Climate modeling'],
     funFact: 'Modern supercomputers can perform more calculations in one second than every person on Earth could complete in several lifetimes.',
   },
+  memory: {
+    id: 'memory',
+    name: 'Memory & Storage',
+    tagline: 'Bits, RAM, ROM & Memory Hierarchy',
+    color: 'purple',
+    definition:
+      'Computer memory consists of electronic storage blocks (cells/shells) with unique addresses that hold binary data (0s and 1s) for processing and long-term storage.',
+    workingPrinciple:
+      'Data is stored in binary bit cells across a hierarchy: Registers & Cache for ultra-fast CPU access, Primary RAM/ROM for active program execution, and Secondary Storage (SSD/HDD) for permanent files.',
+    examples: ['Bits & Bytes', 'CPU Cache', 'RAM (Volatile)', 'ROM (Non-Volatile)', 'NVMe SSD', 'Hard Drive (HDD)'],
+    advantages: [
+      'Allows instant random access to data via memory addresses',
+      'Multi-level hierarchy balances extreme speed with huge capacity',
+      'Enables multitasking and persistent data storage',
+    ],
+    disadvantages: [
+      'Volatile primary memory (RAM) loses data when power is turned off',
+      'Ultra-fast memory (Registers/Cache) is expensive and limited in size',
+      'Secondary storage is significantly slower than CPU cache',
+    ],
+    applications: ['Program execution', 'Operating system loading', 'File storage', 'Data caching'],
+    funFact: '1 Gigabyte of RAM contains over 8,500,000,000 individual microscopic transistor cells, each holding a single 1 or 0 bit!',
+  },
+  os: {
+    id: 'os',
+    name: 'Operating System (OS)',
+    tagline: 'Kernel, CPU Scheduling & Terminal Shell',
+    color: 'cyan',
+    definition:
+      'An Operating System (OS) is the master system software that acts as a bridge between user applications and computer hardware, managing CPU scheduling, memory, files, and device drivers.',
+    workingPrinciple:
+      'The OS Kernel controls system resources, schedules CPU time across running processes, manages RAM allocation, translates user commands (GUI/CLI) into system calls, and handles file I/O operations.',
+    examples: ['Windows 11', 'macOS', 'Linux (Ubuntu)', 'Android', 'iOS'],
+    advantages: [
+      'Provides a user-friendly GUI or command terminal shell (CLI)',
+      'Manages multitasking so many programs run simultaneously on the CPU',
+      'Protects system security and allocates memory safely',
+    ],
+    disadvantages: [
+      'Consumes system CPU and RAM to run background kernel services',
+      'Complex software can have bugs or require system updates',
+      'Requires hardware resources to operate',
+    ],
+    applications: ['Multitasking', 'File system hierarchy', 'Process scheduling', 'Hardware abstraction'],
+    funFact: 'Linux and Unix kernel code powers the vast majority of web servers, cloud supercomputers, and smartphones (via Android)!',
+  },
+  quantum: {
+    id: 'quantum',
+    name: 'Quantum Computer',
+    tagline: 'Superposition, Qubits & Parallel Speed',
+    color: 'cyan',
+    definition:
+      'A Quantum Computer uses quantum mechanics (Qubits, Superposition, and Entanglement) to solve complex mathematical problems millions of times faster than classical computers.',
+    workingPrinciple:
+      'Instead of fixed 0s and 1s, Qubits exist in Superposition (both 0 AND 1 simultaneously) and use Entanglement to evaluate millions of potential paths at the exact same time.',
+    examples: ['IBM Quantum System One', 'Google Sycamore', 'D-Wave Advantage'],
+    advantages: [
+      'Solves complex optimization & encryption problems in seconds',
+      'Quantum parallelism evaluates all paths simultaneously',
+      'Models molecular chemistry & medicine at the atomic level',
+    ],
+    disadvantages: [
+      'Requires near absolute zero cooling (-273°C / 15 Kelvin)',
+      'Highly sensitive to environmental noise (Quantum Decoherence)',
+      'Extremely expensive and delicate to operate',
+    ],
+    applications: ['Drug discovery & medicine', 'Financial modeling', 'Cybersecurity & cryptography', 'Climate simulation'],
+    funFact: 'A Qubit in superposition is like a coin spinning in mid-air — it is both Heads (1) and Tails (0) at the same time until you catch (measure) it!',
+  },
 }
 
-export const computerOrder = ['analog', 'digital', 'hybrid', 'micro', 'mini', 'mainframe', 'super']
+export const hardwareComputerOrder = ['analog', 'digital', 'hybrid', 'micro', 'mini', 'mainframe', 'super']
+export const systemLabsOrder = ['memory', 'os', 'quantum']
+export const computerOrder = hardwareComputerOrder

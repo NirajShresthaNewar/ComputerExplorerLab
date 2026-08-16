@@ -42,9 +42,20 @@ function loadState() {
   return { visited: [], activityCompleted: false, unlocked: [] }
 }
 
+const THEME_STORAGE_KEY = 'cel_theme_v1'
+
+function loadTheme() {
+  try {
+    const saved = localStorage.getItem(THEME_STORAGE_KEY)
+    if (saved) return saved
+  } catch {}
+  return 'dark'
+}
+
 export function AppProvider({ children }) {
   const [soundEnabled, setSoundEnabled] = useState(true)
   const [presentationMode, setPresentationMode] = useState(false)
+  const [theme, setTheme] = useState(loadTheme)
   const [progress, setProgress] = useState(loadState)
   const [newlyUnlocked, setNewlyUnlocked] = useState(null)
   const sound = useSoundEffects(soundEnabled)
@@ -52,6 +63,11 @@ export function AppProvider({ children }) {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(progress))
   }, [progress])
+
+  useEffect(() => {
+    localStorage.setItem(THEME_STORAGE_KEY, theme)
+    document.documentElement.setAttribute('data-theme', theme)
+  }, [theme])
 
   const checkAchievements = useCallback(
     (state) => {
@@ -92,6 +108,8 @@ export function AppProvider({ children }) {
     sound,
     presentationMode,
     setPresentationMode,
+    theme,
+    setTheme,
     progress,
     markVisited,
     markActivityCompleted,

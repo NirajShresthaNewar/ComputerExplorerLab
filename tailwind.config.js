@@ -5,11 +5,11 @@ export default {
     extend: {
       colors: {
         lab: {
-          cyan: '#22d3ee',
+          cyan: 'var(--theme-accent)',
           blue: '#3b82f6',
           purple: '#a855f7',
-          dark: '#0b0f1a',
-          panel: '#111827',
+          dark: 'var(--theme-bg-main)',
+          panel: 'var(--theme-bg-panel)',
         },
       },
       boxShadow: {

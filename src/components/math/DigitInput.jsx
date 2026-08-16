@@ -40,15 +40,15 @@ export default function DigitInput({
   }
 
   // Determine styling based on state
-  let stateClasses = 'border-gray-400 shadow-sm bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200'
+  let stateClasses = 'border-[var(--theme-border)] bg-[var(--theme-input-bg)] text-[var(--theme-input-text)] focus:border-[var(--theme-accent)] focus:ring-2 focus:ring-[var(--theme-accent)]/30 shadow-inner'
   if (isCorrect) {
-    stateClasses = 'border-green-500 bg-green-50 text-green-700 focus:ring-green-200'
+    stateClasses = 'border-emerald-500 bg-emerald-500/20 text-emerald-500 focus:ring-emerald-500/30'
   } else if (isError) {
-    stateClasses = 'border-red-500 bg-red-50 text-red-700 focus:ring-red-200'
+    stateClasses = 'border-red-500 bg-red-500/20 text-red-500 focus:ring-red-500/30'
   }
 
   if (readOnly) {
-    stateClasses = 'border-transparent bg-transparent text-gray-800'
+    stateClasses = 'border-transparent bg-transparent text-[var(--theme-text-main)] font-extrabold'
   }
 
   return (

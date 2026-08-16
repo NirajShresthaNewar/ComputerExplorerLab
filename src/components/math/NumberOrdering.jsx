@@ -82,8 +82,8 @@ export default function NumberOrdering() {
       <div className="w-full max-w-2xl mx-auto flex flex-col gap-6">
         
         {/* Settings Panel */}
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex justify-center gap-4">
-          <label className="flex items-center gap-2 cursor-pointer font-medium text-gray-700">
+        <div className="bg-[var(--theme-bg-card)] p-4 rounded-xl border border-[var(--theme-border)] flex flex-wrap justify-center gap-6 text-[var(--theme-text-main)] shadow-md transition-all">
+          <label className="flex items-center gap-2 cursor-pointer font-medium text-sm opacity-90">
             <input 
               type="radio" 
               name="orderType" 
@@ -93,11 +93,11 @@ export default function NumberOrdering() {
                 setOrderType('ascending')
                 setStatus('idle')
               }} 
-              className="w-4 h-4 text-blue-600 focus:ring-blue-500"
+              className="w-4 h-4 text-[var(--theme-accent)] accent-[var(--theme-accent)]"
             />
             Ascending (Smallest to Largest)
           </label>
-          <label className="flex items-center gap-2 cursor-pointer font-medium text-gray-700">
+          <label className="flex items-center gap-2 cursor-pointer font-medium text-sm opacity-90">
             <input 
               type="radio" 
               name="orderType" 
@@ -107,7 +107,7 @@ export default function NumberOrdering() {
                 setOrderType('descending')
                 setStatus('idle')
               }} 
-              className="w-4 h-4 text-blue-600 focus:ring-blue-500"
+              className="w-4 h-4 text-[var(--theme-accent)] accent-[var(--theme-accent)]"
             />
             Descending (Largest to Smallest)
           </label>
@@ -126,19 +126,23 @@ export default function NumberOrdering() {
           className="flex flex-col gap-3"
         >
           {numbers.map((num, index) => {
-            let bgColor = 'bg-white'
-            let borderColor = 'border-gray-200'
+            let bgColor = 'bg-[var(--theme-bg-card)]'
+            let borderColor = 'border-[var(--theme-border)]'
+            let textColor = 'text-[var(--theme-text-main)]'
             
             if (status === 'correct' || status === 'showing_solution') {
-              bgColor = 'bg-green-50'
-              borderColor = 'border-green-500'
+              bgColor = 'bg-emerald-500/20'
+              borderColor = 'border-emerald-500'
+              textColor = 'text-emerald-400'
             } else if (status === 'error') {
               if (num === correctOrder[index]) {
-                bgColor = 'bg-green-50'
-                borderColor = 'border-green-500'
+                bgColor = 'bg-emerald-500/20'
+                borderColor = 'border-emerald-500'
+                textColor = 'text-emerald-400'
               } else {
-                bgColor = 'bg-red-50'
+                bgColor = 'bg-red-500/20'
                 borderColor = 'border-red-500'
+                textColor = 'text-red-400'
               }
             }
 
@@ -146,14 +150,14 @@ export default function NumberOrdering() {
               <Reorder.Item 
                 key={num} 
                 value={num}
-                className={`flex items-center justify-between p-4 rounded-xl border-2 shadow-sm cursor-grab active:cursor-grabbing transition-colors ${bgColor} ${borderColor}`}
-                whileDrag={{ scale: 1.02, boxShadow: "0px 10px 20px rgba(0,0,0,0.1)", zIndex: 10 }}
+                className={`flex items-center justify-between p-4 rounded-xl border-2 shadow-md cursor-grab active:cursor-grabbing transition-colors ${bgColor} ${borderColor}`}
+                whileDrag={{ scale: 1.02, boxShadow: "0px 10px 20px rgba(0,0,0,0.3)", zIndex: 10 }}
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-800 flex items-center justify-center font-bold">
+                  <div className="w-8 h-8 rounded-full bg-[var(--theme-accent)]/20 text-[var(--theme-accent)] border border-[var(--theme-accent)]/30 flex items-center justify-center font-bold text-sm">
                     {index + 1}
                   </div>
-                  <span className="text-2xl font-bold text-gray-700">{num}</span>
+                  <span className={`text-2xl font-bold ${textColor}`}>{num}</span>
                 </div>
                 
                 {/* Drag handle icon */}

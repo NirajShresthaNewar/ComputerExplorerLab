@@ -257,42 +257,42 @@ export default function VerticalMultiplication() {
       <div className="flex flex-col md:flex-row gap-12 w-full justify-around items-start">
 
         {/* Settings Panel */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 w-full md:w-1/3">
-          <h3 className="font-bold text-gray-700 mb-4">Settings</h3>
+        <div className="bg-[var(--theme-bg-card)] p-6 rounded-2xl border border-[var(--theme-border)] w-full md:w-1/3 shadow-md transition-all">
+          <h3 className="font-bold opacity-80 mb-4 tracking-wide uppercase text-xs">Settings</h3>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">Top Number Digits</label>
+              <label className="block text-sm font-medium opacity-80 mb-1">Top Number Digits</label>
               <input
                 type="range"
                 min="1"
                 max="4"
                 value={digits1}
                 onChange={(e) => setDigits1(parseInt(e.target.value))}
-                className="w-full"
+                className="w-full accent-[var(--theme-accent)] cursor-pointer"
               />
-              <div className="text-center text-sm font-bold text-blue-600 mb-4">{digits1} Digits</div>
+              <div className="text-center text-sm font-bold text-[var(--theme-accent)] mt-1">{digits1} Digits</div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1">Bottom Number Digits</label>
+              <label className="block text-sm font-medium opacity-80 mb-1">Bottom Number Digits</label>
               <input
                 type="range"
                 min="1"
                 max="3"
                 value={digits2}
                 onChange={(e) => setDigits2(parseInt(e.target.value))}
-                className="w-full"
+                className="w-full accent-[var(--theme-accent)] cursor-pointer"
               />
-              <div className="text-center text-sm font-bold text-blue-600 mb-4">{digits2} Digits</div>
+              <div className="text-center text-sm font-bold text-[var(--theme-accent)] mb-4 mt-1">{digits2} Digits</div>
             </div>
 
-            <div className="p-3 bg-gray-50 rounded-xl border border-gray-200 mt-4">
-              <label className="flex items-center gap-3 font-bold text-gray-700 cursor-pointer">
+            <div className="p-3 bg-[var(--theme-bg-panel)] rounded-xl border border-[var(--theme-border)] mt-4">
+              <label className="flex items-center gap-3 font-bold opacity-90 cursor-pointer text-sm">
                 <input
                   type="checkbox"
                   checked={allowCarry}
                   onChange={(e) => setAllowCarry(e.target.checked)}
-                  className="w-5 h-5 text-blue-600 rounded"
+                  className="w-5 h-5 text-[var(--theme-accent)] accent-[var(--theme-accent)] rounded cursor-pointer"
                 />
                 Allow Carry
               </label>
@@ -301,12 +301,12 @@ export default function VerticalMultiplication() {
         </div>
 
         {/* Workspace */}
-        <div className="flex-1 flex justify-center items-center text-gray-800">
+        <div className="flex-1 flex justify-center items-center text-[var(--theme-text-main)]">
           <div className="font-mono text-4xl inline-block">
             {/* Number 1 */}
             <div className="flex flex-row-reverse gap-2 mb-2 justify-end">
               {num1.toString().split('').reverse().map((digit, idx) => (
-                <div key={idx} className="w-10 text-center font-bold">{digit}</div>
+                <div key={idx} className="w-10 text-center font-extrabold text-[var(--theme-text-main)] drop-shadow-sm">{digit}</div>
               ))}
               {/* Padding to match maximum width if needed */}
               {Array(Math.max(0, (userInputs.length > 0 ? userInputs[userInputs.length - 1].length : 0) - num1.toString().length)).fill(0).map((_, i) => (
@@ -316,9 +316,9 @@ export default function VerticalMultiplication() {
 
             {/* Number 2 with operator */}
             <div className="flex flex-row-reverse gap-2 mb-2 justify-end relative">
-              <div className="absolute -left-12 bottom-0 text-gray-500 font-bold">×</div>
+              <div className="absolute -left-12 bottom-0 text-[var(--theme-accent)] font-bold text-4xl">×</div>
               {num2.toString().split('').reverse().map((digit, idx) => (
-                <div key={idx} className="w-10 text-center font-bold">{digit}</div>
+                <div key={idx} className="w-10 text-center font-extrabold text-[var(--theme-text-main)] drop-shadow-sm">{digit}</div>
               ))}
               {/* Padding to match maximum width if needed */}
               {Array(Math.max(0, (userInputs.length > 0 ? userInputs[userInputs.length - 1].length : 0) - num2.toString().length)).fill(0).map((_, i) => (
@@ -327,7 +327,7 @@ export default function VerticalMultiplication() {
             </div>
 
             {/* Divider */}
-            <div className="border-b-4 border-gray-800 mb-4 w-full h-1"></div>
+            <div className="border-b-4 border-[var(--theme-text-main)] opacity-80 mb-4 w-full h-1"></div>
 
             {/* Input Rows */}
             <div className="flex flex-col gap-3 items-end">
@@ -338,7 +338,7 @@ export default function VerticalMultiplication() {
                 return (
                   <div key={rIdx} className="flex flex-col items-end">
                     {isFinalAnswer && (
-                      <div className="border-b-4 border-gray-800 mb-3 w-full h-1 mt-1"></div>
+                      <div className="border-b-4 border-white/80 mb-3 w-full h-1 mt-1"></div>
                     )}
                     <div className="flex flex-row-reverse gap-2 justify-end">
                       {row.map((val, cIdx) => (

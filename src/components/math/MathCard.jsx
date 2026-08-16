@@ -17,17 +17,17 @@ export default function MathCard({
   feedbackMessage,
 }) {
   return (
-    <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.25)] max-w-4xl mx-auto border border-gray-200">
+    <div className="glass rounded-3xl p-6 md:p-8 shadow-2xl max-w-4xl mx-auto transition-all duration-300">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+          <h2 className="text-2xl font-bold flex items-center gap-2 drop-shadow-sm opacity-95">
             {title}
           </h2>
-          <p className="text-gray-600 text-sm mt-1">{instructions}</p>
+          <p className="opacity-70 text-sm mt-1">{instructions}</p>
         </div>
         {(score !== undefined && total !== undefined) && (
-          <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded-full font-bold flex items-center gap-2">
+          <div className="bg-lab-cyan/20 border border-lab-cyan/30 text-lab-cyan px-4 py-2 rounded-full font-bold flex items-center gap-2">
             <span>Score:</span>
             <span>{score} / {total}</span>
           </div>
@@ -35,7 +35,7 @@ export default function MathCard({
       </div>
 
       {/* Main Content Area */}
-      <div className="bg-gray-100 border border-gray-200 rounded-2xl p-6 md:p-10 mb-6 shadow-inner min-h-[250px] flex items-center justify-center relative overflow-hidden">
+      <div className="bg-[var(--theme-bg-panel)] border border-[var(--theme-border)] rounded-2xl p-6 md:p-10 mb-6 shadow-inner min-h-[250px] flex items-center justify-center relative overflow-hidden transition-all duration-300">
         {children}
         
         {/* Feedback Overlay */}
@@ -44,7 +44,7 @@ export default function MathCard({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className={`absolute bottom-4 left-1/2 -translate-x-1/2 px-6 py-2 rounded-full font-bold text-white shadow-lg ${
-              isCorrect ? 'bg-green-500' : 'bg-red-500'
+              isCorrect ? 'bg-emerald-600' : 'bg-red-600'
             }`}
           >
             {feedbackMessage}
@@ -57,7 +57,7 @@ export default function MathCard({
         {onGenerate && (
           <button
             onClick={onGenerate}
-            className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-colors"
+            className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-semibold transition-all shadow-md"
           >
             <RefreshCw size={18} />
             Generate
@@ -67,7 +67,7 @@ export default function MathCard({
         {onCheck && (
           <button
             onClick={onCheck}
-            className="flex items-center gap-2 px-6 py-2.5 bg-green-500 hover:bg-green-600 text-white rounded-xl font-bold shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5"
+            className="flex items-center gap-2 px-6 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 transition-all transform hover:-translate-y-0.5"
           >
             <CheckCircle size={20} />
             Check Answer
@@ -77,7 +77,7 @@ export default function MathCard({
         {onHint && (
           <button
             onClick={onHint}
-            className="flex items-center gap-2 px-5 py-2.5 bg-yellow-400 hover:bg-yellow-500 text-yellow-900 rounded-xl font-medium transition-colors"
+            className="flex items-center gap-2 px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl font-bold transition-all shadow-md"
           >
             <HelpCircle size={18} />
             Hint
@@ -87,7 +87,7 @@ export default function MathCard({
         {onShowSolution && (
           <button
             onClick={onShowSolution}
-            className="flex items-center gap-2 px-5 py-2.5 bg-purple-500 hover:bg-purple-600 text-white rounded-xl font-medium transition-colors"
+            className="flex items-center gap-2 px-5 py-2.5 bg-purple-600 hover:bg-purple-500 text-white rounded-xl font-semibold transition-all shadow-md"
           >
             <Eye size={18} />
             Solution
@@ -97,7 +97,7 @@ export default function MathCard({
         {onReset && (
           <button
             onClick={onReset}
-            className="flex items-center gap-2 px-5 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl font-medium transition-colors"
+            className="flex items-center gap-2 px-5 py-2.5 bg-white/10 hover:bg-white/20 text-gray-200 rounded-xl font-semibold border border-white/10 transition-all"
           >
             Reset
           </button>
@@ -106,7 +106,7 @@ export default function MathCard({
         {onNext && (
           <button
             onClick={onNext}
-            className="flex items-center gap-2 px-6 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-xl font-bold transition-colors ml-auto"
+            className="flex items-center gap-2 px-6 py-2.5 bg-lab-cyan/20 hover:bg-lab-cyan/30 text-lab-cyan border border-lab-cyan/40 rounded-xl font-bold transition-all ml-auto"
           >
             Next
             <ChevronRight size={20} />
