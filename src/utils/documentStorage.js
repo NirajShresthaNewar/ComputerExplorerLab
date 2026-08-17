@@ -1,6 +1,11 @@
-// IndexedDB + fallback storage utility for folders and documents
+// IndexedDB + Vercel Blob cloud storage utility for folders and documents
+import {
+  isVercelBlobConfigured,
+  uploadToVercelBlob,
+  deleteFromVercelBlob,
+} from './vercelBlob'
 
-const DB_NAME = 'ComputerExplorerLab_DocHub_v4'
+const DB_NAME = 'ComputerExplorerLab_DocHub_v5'
 const DB_VERSION = 1
 
 const DEFAULT_FOLDERS = [
@@ -21,6 +26,7 @@ const SAMPLE_DOCS = [
     name: 'Class 3 Math Study Notes & Exercises.txt',
     type: 'text/plain',
     size: 1024,
+    storedIn: 'local',
     buffer: createSampleTextBuffer(
       'Class 3 Mathematics Study Guide',
       'Welcome to Class 3 Mathematics Resources!\n\n1. Vertical Addition & Subtraction\n   - Always align digits starting from the right (ones place).\n   - Remember to carry over when sum >= 10.\n\n2. Vertical Multiplication\n   - Multiply ones digit first, then tens digit.\n   - Practice multiplication tables from 1 to 10.'
@@ -33,6 +39,7 @@ const SAMPLE_DOCS = [
     name: 'Computer Explorer Lab Guide.txt',
     type: 'text/plain',
     size: 2048,
+    storedIn: 'local',
     buffer: createSampleTextBuffer(
       'Computer Explorer Lab Guide',
       'Overview of Computer Types:\n1. Analog Computers: Measure continuous physical quantities (thermometers, speedometers).\n2. Digital Computers: Process discrete binary data (laptops, PCs).\n3. Hybrid Computers: Combine analog speed with digital accuracy.\n4. Microcomputers, Minicomputers, Mainframe & Supercomputers.'
@@ -40,9 +47,6 @@ const SAMPLE_DOCS = [
     createdAt: Date.now() - 40000,
   },
 ]
-
-// Flag to track initial sample seeding
-let hasSeeded = false
 
 function openDB() {
   return new Promise((resolve, reject) => {
@@ -57,7 +61,6 @@ function openDB() {
       if (!db.objectStoreNames.contains('documents')) {
         const docStore = db.createObjectStore('documents', { keyPath: 'id' })
         SAMPLE_DOCS.forEach((d) => docStore.add(d))
-        hasSeeded = true
       }
     }
 
@@ -81,7 +84,7 @@ export async function getFolders() {
       const request = store.getAll()
       request.onsuccess = () => {
         const res = request.result || []
-        resolve(res)
+        resolve(res.length ? res : memoryStore.folders)
       }
       request.onerror = () => resolve(memoryStore.folders)
     })
@@ -122,7 +125,12 @@ export async function deleteFolder(folderId) {
       docReq.onsuccess = () => {
         const docs = docReq.result || []
         docs.forEach((doc) => {
-          if (doc.folderId === folderId) docStore.delete(doc.id)
+          if (doc.folderId === folderId) {
+            if (doc.storedIn === 'vercel-blob' && doc.url) {
+              deleteFromVercelBlob(doc.url)
+            }
+            docStore.delete(doc.id)
+          }
         })
       }
 
@@ -151,6 +159,10 @@ export async function getDocuments(folderId = null) {
     rawDocs = memoryStore.documents
   }
 
+  if (!rawDocs || rawDocs.length === 0) {
+    rawDocs = memoryStore.documents
+  }
+
   const processed = rawDocs.map((doc) => {
     let blob = doc.blob
     if (!blob && doc.buffer) {
@@ -159,6 +171,7 @@ export async function getDocuments(folderId = null) {
     return {
       ...doc,
       blob: blob || new Blob([''], { type: doc.type }),
+      storedIn: doc.storedIn || (doc.url ? 'vercel-blob' : 'local'),
     }
   })
 
@@ -171,6 +184,17 @@ export async function getDocuments(folderId = null) {
 export async function uploadDocument(file, folderId = 'class-3-math') {
   const buffer = await file.arrayBuffer()
   const mimeType = file.type || getFallbackFileType(file.name)
+  let cloudInfo = null
+
+  // If Vercel Blob token is configured, upload directly to Vercel Blob cloud
+  if (isVercelBlobConfigured()) {
+    try {
+      cloudInfo = await uploadToVercelBlob(file)
+    } catch (err) {
+      console.warn('Vercel Blob upload failed, falling back to local storage:', err)
+      // Continue to local storage fallback
+    }
+  }
 
   const doc = {
     id: 'doc-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
@@ -178,7 +202,11 @@ export async function uploadDocument(file, folderId = 'class-3-math') {
     name: file.name,
     type: mimeType,
     size: file.size,
-    buffer, // Stored safely as ArrayBuffer
+    buffer, // Keep buffer for local fallback/offline view
+    storedIn: cloudInfo ? 'vercel-blob' : 'local',
+    url: cloudInfo ? cloudInfo.url : null,
+    downloadUrl: cloudInfo ? cloudInfo.downloadUrl : null,
+    pathname: cloudInfo ? cloudInfo.pathname : null,
     createdAt: Date.now(),
   }
 
@@ -187,7 +215,7 @@ export async function uploadDocument(file, folderId = 'class-3-math') {
     await new Promise((resolve, reject) => {
       const tx = db.transaction('documents', 'readwrite')
       const store = tx.objectStore('documents')
-      const req = store.add(doc)
+      const req = store.put(doc)
       req.onsuccess = () => resolve(true)
       req.onerror = () => reject(req.error)
     })
@@ -195,8 +223,13 @@ export async function uploadDocument(file, folderId = 'class-3-math') {
     console.warn('IndexedDB write failed, using memory fallback', e)
   }
 
-  // Also sync memory store
-  memoryStore.documents.push(doc)
+  // Update memory store
+  const existingIdx = memoryStore.documents.findIndex((d) => d.id === doc.id)
+  if (existingIdx >= 0) {
+    memoryStore.documents[existingIdx] = doc
+  } else {
+    memoryStore.documents.push(doc)
+  }
 
   return {
     ...doc,
@@ -204,9 +237,68 @@ export async function uploadDocument(file, folderId = 'class-3-math') {
   }
 }
 
-export async function deleteDocument(docId) {
+export async function migrateDocToVercelBlob(doc) {
+  if (!isVercelBlobConfigured()) {
+    throw new Error('Please configure your Vercel Blob Read-Write Token first.')
+  }
+
+  let fileToUpload
+  if (doc.blob && doc.blob instanceof Blob) {
+    fileToUpload = new File([doc.blob], doc.name, { type: doc.type })
+  } else if (doc.buffer) {
+    fileToUpload = new File([doc.buffer], doc.name, { type: doc.type })
+  } else {
+    throw new Error('Document buffer/blob unavailable for cloud migration.')
+  }
+
+  const cloudInfo = await uploadToVercelBlob(fileToUpload)
+
+  const updatedDoc = {
+    ...doc,
+    storedIn: 'vercel-blob',
+    url: cloudInfo.url,
+    downloadUrl: cloudInfo.downloadUrl,
+    pathname: cloudInfo.pathname,
+  }
+
   try {
     const db = await openDB()
+    await new Promise((resolve, reject) => {
+      const tx = db.transaction('documents', 'readwrite')
+      const store = tx.objectStore('documents')
+      const req = store.put(updatedDoc)
+      req.onsuccess = () => resolve(true)
+      req.onerror = () => reject(req.error)
+    })
+  } catch (e) {
+    console.warn('IndexedDB update failed during cloud migration', e)
+  }
+
+  const idx = memoryStore.documents.findIndex((d) => d.id === doc.id)
+  if (idx >= 0) {
+    memoryStore.documents[idx] = updatedDoc
+  }
+
+  return updatedDoc
+}
+
+export async function deleteDocument(docId) {
+  let docToDelete = memoryStore.documents.find((d) => d.id === docId)
+  
+  try {
+    const db = await openDB()
+    const dbDoc = await new Promise((resolve) => {
+      const tx = db.transaction('documents', 'readonly')
+      const req = tx.objectStore('documents').get(docId)
+      req.onsuccess = () => resolve(req.result)
+      req.onerror = () => resolve(null)
+    })
+    if (dbDoc) docToDelete = dbDoc
+
+    if (docToDelete && docToDelete.storedIn === 'vercel-blob' && docToDelete.url) {
+      await deleteFromVercelBlob(docToDelete.url)
+    }
+
     await new Promise((resolve, reject) => {
       const tx = db.transaction('documents', 'readwrite')
       const store = tx.objectStore('documents')
