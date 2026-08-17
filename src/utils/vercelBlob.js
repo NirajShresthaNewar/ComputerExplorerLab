@@ -71,26 +71,29 @@ export async function uploadToVercelBlob(file, customFilename = null) {
       size: file.size,
     }
   } catch (sdkErr) {
-    console.warn('SDK upload error, trying direct Vercel Blob REST endpoint...', sdkErr)
-    // Fallback to direct REST endpoint upload if SDK call encounters client environment restrictions
+    console.warn('SDK upload error, attempting direct REST endpoint upload...', sdkErr)
     return await uploadViaRestApi(file, filename, mimeType, token)
   }
 }
 
 /**
- * Fallback direct REST API upload for Vercel Blob
+ * Direct REST API upload for Vercel Blob using the exact Vercel Blob Protocol.
+ * Endpoint: https://blob.vercel-storage.com/?pathname=<filename>
  */
 async function uploadViaRestApi(file, filename, mimeType, token) {
-  const encodedName = encodeURIComponent(filename)
-  const uploadUrl = `https://blob.vercel-storage.com/${encodedName}?addRandomSuffix=true`
+  const params = new URLSearchParams({
+    pathname: filename,
+  })
+  const uploadUrl = `https://blob.vercel-storage.com/?${params.toString()}`
 
   const response = await fetch(uploadUrl, {
     method: 'PUT',
     headers: {
       authorization: `Bearer ${token}`,
       'x-api-version': '7',
-      'x-access': 'public',
-      'content-type': mimeType,
+      'x-vercel-blob-access': 'public',
+      'x-content-type': mimeType,
+      'x-add-random-suffix': '1',
     },
     body: file,
   })
