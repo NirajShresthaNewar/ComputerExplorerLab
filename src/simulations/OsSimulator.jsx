@@ -17,9 +17,24 @@ import {
   ShieldAlert,
   ArrowDown,
   Command,
+  MemoryStick,
+  Zap,
+  AlertTriangle,
+  Plus,
+  Trash2,
 } from 'lucide-react'
 import InfoPanel from '../components/InfoPanel'
 import { computerTypes } from '../data/computerData'
+
+const RAM_TOTAL_MB = 2048 // 2 GB simulation
+const APP_REQUESTS = [
+  { id: 'chrome', name: 'Launch Chrome', ram: 650, cpu: 35, icon: '🌐', color: 'from-blue-500 to-indigo-600' },
+  { id: 'print', name: 'Print Document', ram: 80, cpu: 8, icon: '🖨️', color: 'from-gray-500 to-slate-600' },
+  { id: 'scan', name: 'Scan Disk', ram: 120, cpu: 45, icon: '💿', color: 'from-amber-500 to-orange-600' },
+  { id: 'render', name: '3D Render Task', ram: 900, cpu: 90, icon: '🎮', color: 'from-purple-500 to-violet-600' },
+  { id: 'spotify', name: 'Stream Spotify', ram: 280, cpu: 12, icon: '🎵', color: 'from-emerald-500 to-teal-600' },
+  { id: 'antivirus', name: 'Antivirus Full Scan', ram: 450, cpu: 70, icon: '🛡️', color: 'from-rose-500 to-red-600' },
+]
 
 const OS_LAYERS = [
   {
@@ -64,7 +79,14 @@ const INITIAL_PROCESSES = [
 ]
 
 export default function OsSimulator() {
-  const [activeTab, setActiveTab] = useState('layers') // 'layers', 'scheduler', 'terminal'
+  const [activeTab, setActiveTab] = useState('layers') // 'layers', 'scheduler', 'resource', 'terminal'
+
+  // Stage 4: OS Resource Manager (RAM + CPU)
+  const [ramAllocations, setRamAllocations] = useState([]) // { appId, name, ram, cpu, color, icon }
+  const [oomAlert, setOomAlert] = useState(false)
+  const [cpuLoad, setCpuLoad] = useState(0)
+  const ramUsed = ramAllocations.reduce((sum, a) => sum + a.ram, 0)
+  const ramPct = Math.min((ramUsed / RAM_TOTAL_MB) * 100, 100)
 
   // Stage 1: System Call Simulation state
   const [selectedLayer, setSelectedLayer] = useState(OS_LAYERS[0])
@@ -238,6 +260,29 @@ export default function OsSimulator() {
     setCmdInput('')
   }
 
+  const handleLaunchApp = (app) => {
+    if (ramAllocations.find((a) => a.id === app.id)) return // already running
+    const newUsed = ramUsed + app.ram
+    if (newUsed > RAM_TOTAL_MB) {
+      setOomAlert(true)
+      setTimeout(() => setOomAlert(false), 3000)
+      return
+    }
+    setOomAlert(false)
+    const newAlloc = [...ramAllocations, { ...app }]
+    setRamAllocations(newAlloc)
+    const newCpu = Math.min(newAlloc.reduce((s, a) => s + a.cpu, 0), 99)
+    setCpuLoad(newCpu)
+  }
+
+  const handleKillApp = (appId) => {
+    const newAlloc = ramAllocations.filter((a) => a.id !== appId)
+    setRamAllocations(newAlloc)
+    const newCpu = newAlloc.reduce((s, a) => s + a.cpu, 0)
+    setCpuLoad(Math.min(newCpu, 99))
+    setOomAlert(false)
+  }
+
   return (
     <div className="space-y-8">
       {/* Top Header & Interactive Mode Tabs */}
@@ -253,41 +298,53 @@ export default function OsSimulator() {
         </div>
 
         {/* Tab Selector */}
-        <div className="flex p-1.5 bg-[var(--theme-bg-panel)] rounded-2xl border border-[var(--theme-border)]">
+        <div className="flex flex-wrap p-1.5 bg-[var(--theme-bg-panel)] rounded-2xl border border-[var(--theme-border)] gap-1">
           <button
             onClick={() => setActiveTab('layers')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
               activeTab === 'layers'
                 ? 'bg-lab-cyan text-slate-950 shadow-lg font-extrabold scale-105'
                 : 'opacity-70 hover:opacity-100'
             }`}
           >
             <Layers size={16} />
-            <span>1. OS System Layers</span>
+            <span>1. OS Layers</span>
           </button>
 
           <button
             onClick={() => setActiveTab('scheduler')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
               activeTab === 'scheduler'
                 ? 'bg-lab-cyan text-slate-950 shadow-lg font-extrabold scale-105'
                 : 'opacity-70 hover:opacity-100'
             }`}
           >
             <Activity size={16} />
-            <span>2. CPU Multitasking</span>
+            <span>2. CPU Scheduling</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('resource')}
+            className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
+              activeTab === 'resource'
+                ? 'bg-emerald-400 text-slate-950 shadow-lg font-extrabold scale-105'
+                : 'opacity-70 hover:opacity-100'
+            }`}
+          >
+            <MemoryStick size={16} />
+            <span>3. RAM Manager</span>
           </button>
 
           <button
             onClick={() => setActiveTab('terminal')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
               activeTab === 'terminal'
                 ? 'bg-lab-cyan text-slate-950 shadow-lg font-extrabold scale-105'
                 : 'opacity-70 hover:opacity-100'
             }`}
           >
             <Terminal size={16} />
-            <span>3. Terminal CLI & GUI</span>
+            <span>4. Terminal CLI</span>
           </button>
         </div>
       </div>
@@ -531,9 +588,187 @@ export default function OsSimulator() {
           )}
 
           {/* ============================================================== */}
-          {/* STAGE 3: INTERACTIVE TERMINAL CLI VS GUI */}
+          {/* STAGE 3: OS RAM & CPU RESOURCE MANAGER                         */}
+          {/* ============================================================== */}
+          {activeTab === 'resource' && (
+            <div className="glass rounded-3xl p-6 md:p-8 space-y-6 border border-white/10">
+              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[var(--theme-border)] pb-4">
+                <div>
+                  <h3 className="text-xl font-bold flex items-center gap-2">
+                    <MemoryStick className="text-emerald-400" size={22} />
+                    OS CPU & Memory Resource Manager
+                  </h3>
+                  <p className="text-xs opacity-70 mt-1">
+                    Click app request cards to launch them. Watch the OS allocate RAM blocks and balance CPU time slices!
+                  </p>
+                </div>
+                <button
+                  onClick={() => { setRamAllocations([]); setCpuLoad(0); setOomAlert(false) }}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 transition-all text-xs font-bold"
+                >
+                  <RotateCcw size={15} /> Clear All
+                </button>
+              </div>
+
+              {/* CPU & RAM Status Gauges */}
+              <div className="grid sm:grid-cols-2 gap-4">
+                {/* CPU Load */}
+                <div className="p-4 bg-[var(--theme-bg-panel)] rounded-2xl border border-[var(--theme-border)] space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-xs font-bold">
+                      <Cpu size={16} className="text-lab-cyan" />
+                      CPU Core Load
+                    </div>
+                    <span className={`font-mono font-bold text-sm ${cpuLoad > 85 ? 'text-red-400' : cpuLoad > 60 ? 'text-amber-400' : 'text-emerald-400'}`}>
+                      {cpuLoad}%
+                    </span>
+                  </div>
+                  <div className="h-5 w-full bg-slate-800 rounded-full overflow-hidden border border-white/10 relative">
+                    <motion.div
+                      animate={{ width: `${cpuLoad}%` }}
+                      transition={{ duration: 0.5 }}
+                      className={`h-full rounded-full relative overflow-hidden ${
+                        cpuLoad > 85 ? 'bg-gradient-to-r from-red-500 to-rose-600'
+                        : cpuLoad > 60 ? 'bg-gradient-to-r from-amber-500 to-orange-500'
+                        : 'bg-gradient-to-r from-emerald-500 to-teal-500'
+                      }`}
+                    >
+                      <div className="absolute inset-0 bg-white/10 animate-pulse" style={{ animationDuration: '1.5s' }} />
+                    </motion.div>
+                  </div>
+                  <div className="flex justify-between text-[9px] opacity-60 font-mono">
+                    <span>0% IDLE</span><span>50% BALANCED</span><span>100% THROTTLED</span>
+                  </div>
+                </div>
+
+                {/* RAM Bar */}
+                <div className="p-4 bg-[var(--theme-bg-panel)] rounded-2xl border border-[var(--theme-border)] space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-xs font-bold">
+                      <MemoryStick size={16} className="text-purple-400" />
+                      RAM Allocation
+                    </div>
+                    <span className={`font-mono font-bold text-sm ${ramPct > 90 ? 'text-red-400' : ramPct > 70 ? 'text-amber-400' : 'text-emerald-400'}`}>
+                      {ramUsed} / {RAM_TOTAL_MB} MB
+                    </span>
+                  </div>
+
+                  {/* Segmented RAM Bar */}
+                  <div className="h-5 w-full bg-slate-800 rounded-full overflow-hidden border border-white/10 flex">
+                    {ramAllocations.map((app, idx) => (
+                      <motion.div
+                        key={app.id}
+                        initial={{ width: 0 }}
+                        animate={{ width: `${(app.ram / RAM_TOTAL_MB) * 100}%` }}
+                        transition={{ duration: 0.4 }}
+                        className={`h-full bg-gradient-to-r ${app.color} border-r border-slate-900`}
+                        title={`${app.name}: ${app.ram} MB`}
+                      />
+                    ))}
+                  </div>
+
+                  {/* RAM legend */}
+                  <div className="flex flex-wrap gap-1.5">
+                    {ramAllocations.map((app) => (
+                      <div key={app.id} className="flex items-center gap-1 text-[10px]">
+                        <div className={`w-2.5 h-2.5 rounded-sm bg-gradient-to-r ${app.color}`} />
+                        <span className="opacity-70 truncate max-w-[70px]">{app.name}</span>
+                      </div>
+                    ))}
+                    {ramAllocations.length === 0 && <span className="text-[10px] opacity-40">No apps running</span>}
+                  </div>
+                </div>
+              </div>
+
+              {/* OOM Alert */}
+              <AnimatePresence>
+                {oomAlert && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    className="p-4 bg-red-500/20 border-2 border-red-500 rounded-2xl text-red-300 flex items-center gap-3 text-xs font-bold"
+                  >
+                    <AlertTriangle size={20} className="animate-pulse" />
+                    <div>
+                      <div className="text-sm font-extrabold">⛔ OUT OF MEMORY (OOM) — System Protection Active!</div>
+                      <div className="font-normal opacity-90 mt-0.5">
+                        Not enough RAM to launch this app. The OS has blocked the request to prevent a system crash. 
+                        Close other running apps first to free RAM!
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* App Request Queue */}
+              <div className="space-y-3">
+                <span className="text-xs font-bold uppercase tracking-wider opacity-70 block">
+                  App Request Queue — Click to Launch or Kill:
+                </span>
+                <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
+                  {APP_REQUESTS.map((app) => {
+                    const isRunning = !!ramAllocations.find((a) => a.id === app.id)
+                    return (
+                      <motion.div
+                        key={app.id}
+                        whileHover={{ scale: 1.02 }}
+                        className={`p-4 rounded-2xl border-2 space-y-2.5 transition-all cursor-pointer ${
+                          isRunning
+                            ? 'bg-emerald-500/10 border-emerald-500/50 shadow-lg shadow-emerald-500/10'
+                            : 'bg-[var(--theme-bg-panel)] border-[var(--theme-border)] hover:border-white/30'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="text-2xl">{app.icon}</span>
+                            <span className="text-xs font-bold">{app.name}</span>
+                          </div>
+                          {isRunning ? (
+                            <button
+                              onClick={() => handleKillApp(app.id)}
+                              className="p-1.5 rounded-lg bg-red-500/20 hover:bg-red-500/40 transition-all text-red-400"
+                              title="Kill process & free RAM"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => handleLaunchApp(app)}
+                              className="p-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/40 transition-all text-emerald-400"
+                              title="Launch app"
+                            >
+                              <Plus size={14} />
+                            </button>
+                          )}
+                        </div>
+                        <div className="flex gap-2 text-[10px] font-mono">
+                          <span className={`px-2 py-0.5 rounded-full ${isRunning ? 'bg-purple-500/20 text-purple-300' : 'bg-white/10 text-gray-400'}`}>
+                            RAM: {app.ram} MB
+                          </span>
+                          <span className={`px-2 py-0.5 rounded-full ${isRunning ? 'bg-blue-500/20 text-blue-300' : 'bg-white/10 text-gray-400'}`}>
+                            CPU: {app.cpu}%
+                          </span>
+                        </div>
+                        {isRunning && (
+                          <div className="flex items-center gap-1.5 text-[10px] text-emerald-400 font-bold">
+                            <Zap size={12} className="animate-pulse" />
+                            Running — OS time-slicing active
+                          </div>
+                        )}
+                      </motion.div>
+                    )
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ============================================================== */}
+          {/* STAGE 4: INTERACTIVE TERMINAL CLI VS GUI                        */}
           {/* ============================================================== */}
           {activeTab === 'terminal' && (
+
             <div className="glass rounded-3xl p-6 md:p-8 space-y-6 border border-white/10">
               <div className="border-b border-[var(--theme-border)] pb-4">
                 <h3 className="text-xl font-bold flex items-center gap-2">

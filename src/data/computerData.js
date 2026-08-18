@@ -229,8 +229,108 @@ export const computerTypes = {
     applications: ['Drug discovery & medicine', 'Financial modeling', 'Cybersecurity & cryptography', 'Climate simulation'],
     funFact: 'A Qubit in superposition is like a coin spinning in mid-air — it is both Heads (1) and Tails (0) at the same time until you catch (measure) it!',
   },
+  'software-class': {
+    id: 'software-class',
+    name: 'Software Classification Hub',
+    tagline: 'System vs. Application Software & Sub-Categories',
+    color: 'blue',
+    definition:
+      'Computer software is classified into System Software (which operates hardware & system operations) and Application Software (which helps users perform specific tasks).',
+    workingPrinciple:
+      'System software runs behind the scenes to manage hardware (OS, Drivers, Utilities, Language Processors), while Application software runs on top to serve user goals (Packaged spreadsheets/browsers & Tailored custom software).',
+    examples: ['Windows 11', 'MS Excel', 'Device Drivers', 'Antivirus Utility', 'Python Interpreter', 'Custom Billing App'],
+    advantages: [
+      'Clear separation of system control from user applications',
+      'System software keeps hardware stable and secure',
+      'Application software provides tailored productivity tools for users',
+    ],
+    disadvantages: [
+      'Application software cannot run without underlying System Software',
+      'Tailored custom software can be expensive to develop',
+      'Utility software can consume CPU background resources',
+    ],
+    applications: ['Operating system management', 'Business spreadsheets', 'Device connectivity', 'System maintenance'],
+    funFact: 'Without an Operating System (System Software), your smartphone or PC hardware would just be a useless pile of metal and silicon silicon chips!',
+  },
+  'lang-processor': {
+    id: 'lang-processor',
+    name: 'Language Processors',
+    tagline: 'Compiler vs. Interpreter Live Execution',
+    color: 'purple',
+    definition:
+      'Language Processors (Compilers & Interpreters) translate high-level programming languages (like Python or C++) into machine binary code (0s and 1s) that the CPU can execute.',
+    workingPrinciple:
+      'Interpreters translate and execute code line-by-line (stopping instantly on errors), whereas Compilers scan all lines at once, report batch errors, and produce an executable machine code file.',
+    examples: ['Python Interpreter', 'C++ GCC Compiler', 'Java Bytecode Compiler', 'JavaScript V8 Engine'],
+    advantages: [
+      'Interpreters allow fast debugging by catching errors immediately line-by-line',
+      'Compilers produce faster-running binary machine code for high performance',
+      'Allows humans to write readable pseudocode instead of raw binary 0s and 1s',
+    ],
+    disadvantages: [
+      'Interpreted code generally runs slower than compiled code',
+      'Compiled code requires a total re-compile every time a single line changes',
+      'Language translation takes extra CPU processing time',
+    ],
+    applications: ['Software development', 'Web browser JavaScript engines', 'Mobile app compilation', 'Game engines'],
+    funFact: 'The first compiler was invented in 1952 by pioneer Grace Hopper, who famously popularized the term "debugging" after finding a real moth inside a computer!',
+  },
+  'translation-pipeline': {
+    id: 'translation-pipeline',
+    name: 'Translation Pipeline',
+    tagline: 'High-Level -> Assembly -> Machine Code & Lightboard',
+    color: 'cyan',
+    definition:
+      'The Translation Pipeline illustrates how human-readable code passes through Assembly mnemonics down to raw binary pulses that light up electrical circuits inside the CPU.',
+    workingPrinciple:
+      'High-Level commands (e.g. Print "Hello") convert to Assembly registers (e.g. MOV AX, 01), which translate to 8-bit/16-bit binary bytes (01001000...) that flip physical CPU transistors ON or OFF.',
+    examples: ['High-Level (Python/C)', 'Assembly (x86/ARM Assembly)', 'Machine Code (Binary Bytes)', 'Hardware Electrical Pulses'],
+    advantages: [
+      'Provides a complete visual model of computer execution levels',
+      'Connects high-level programming directly to hardware electronic logic',
+      'Demonstrates how binary bits control physical microchip transistors',
+    ],
+    disadvantages: [
+      'Assembly programming is tedious and specific to chip architectures',
+      'Direct machine code binary programming is prone to human error',
+      'Hardware clock cycles limit maximum electrical signal speeds',
+    ],
+    applications: ['Microprocessor design', 'Low-level hardware firmware', 'Embedded systems', 'Computer science education'],
+    funFact: 'Every single letter or color on your screen right now is stored as a series of 0s (OFF LEDs) and 1s (ON LEDs) in your computer memory!',
+  },
+  'device-driver': {
+    id: 'device-driver',
+    name: 'Device Driver Bridge',
+    tagline: 'Hardware Communication & Connectivity Bridge',
+    color: 'emerald',
+    definition:
+      'A Device Driver is specialized system software that acts as a translator bridge between the Operating System and physical hardware components (Printers, GPUs, Sound Cards).',
+    workingPrinciple:
+      'When an app initiates a hardware task (e.g., Print Document), the OS passes system calls to the Device Driver, which converts the generic request into precise electronic hardware instructions.',
+    examples: ['Printer Driver', 'NVIDIA Graphics Driver', 'Realtek Audio Driver', 'USB Controller Driver'],
+    advantages: [
+      'Allows the OS to control thousands of different hardware brands with standard APIs',
+      'Enables plug-and-play hardware compatibility',
+      'Protects system stability by isolating hardware communication code',
+    ],
+    disadvantages: [
+      'Outdated or missing drivers cause "Device Not Recognized" errors',
+      'Faulty drivers are a leading cause of OS crashes (Blue Screen of Death)',
+      'Requires frequent manufacturer software updates',
+    ],
+    applications: ['Printing paper', 'Rendering 3D graphics', 'Playing audio sound', 'Scanning documents'],
+    funFact: 'Without a printer driver installed, your computer speaks "English" while your printer speaks "Japanese" — they cannot understand each other without the driver bridge!',
+  },
 }
 
 export const hardwareComputerOrder = ['analog', 'digital', 'hybrid', 'micro', 'mini', 'mainframe', 'super']
-export const systemLabsOrder = ['memory', 'os', 'quantum']
+export const systemLabsOrder = [
+  'software-class',
+  'os',
+  'lang-processor',
+  'translation-pipeline',
+  'device-driver',
+  'memory',
+  'quantum',
+]
 export const computerOrder = hardwareComputerOrder

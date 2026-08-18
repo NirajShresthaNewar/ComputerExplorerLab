@@ -44,7 +44,7 @@ export function isVercelBlobConfigured() {
 
 /**
  * Uploads a file to Vercel Blob storage.
- * Returns metadata including { url, downloadUrl, pathname, contentType }.
+ * Direct REST API call is executed immediately in browser environments for ultra-fast response.
  */
 export async function uploadToVercelBlob(file, customFilename = null) {
   const token = getVercelBlobToken()
@@ -55,8 +55,11 @@ export async function uploadToVercelBlob(file, customFilename = null) {
   const filename = customFilename || file.name
   const mimeType = file.type || getFallbackMimeType(filename)
 
+  // Direct REST API call executes instantly in browser environment
   try {
-    // Attempt standard @vercel/blob SDK put call first
+    return await uploadViaRestApi(file, filename, mimeType, token)
+  } catch (restErr) {
+    console.warn('Direct REST upload error, attempting SDK put fallback...', restErr)
     const blobResult = await put(filename, file, {
       access: 'public',
       token,
@@ -70,14 +73,11 @@ export async function uploadToVercelBlob(file, customFilename = null) {
       contentType: blobResult.contentType || mimeType,
       size: file.size,
     }
-  } catch (sdkErr) {
-    console.warn('SDK upload error, attempting direct REST endpoint upload...', sdkErr)
-    return await uploadViaRestApi(file, filename, mimeType, token)
   }
 }
 
 /**
- * Direct REST API upload for Vercel Blob using the exact Vercel Blob Protocol.
+ * Direct REST API upload for Vercel Blob using the standard Vercel Blob Protocol.
  * Endpoint: https://blob.vercel-storage.com/?pathname=<filename>
  */
 async function uploadViaRestApi(file, filename, mimeType, token) {
@@ -125,25 +125,23 @@ export async function deleteFromVercelBlob(url) {
   }
 
   try {
+    const response = await fetch('https://blob.vercel-storage.com/delete', {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${token}`,
+        'x-api-version': '7',
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({ urls: [url] }),
+    })
+    if (response.ok) return true
+    
+    // SDK fallback
     await del(url, { token })
     return true
   } catch (err) {
-    console.warn('Vercel Blob SDK delete failed, trying REST API...', err)
-    try {
-      const response = await fetch('https://blob.vercel-storage.com/delete', {
-        method: 'POST',
-        headers: {
-          authorization: `Bearer ${token}`,
-          'x-api-version': '7',
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify({ urls: [url] }),
-      })
-      return response.ok
-    } catch (restErr) {
-      console.error('Failed to delete blob from Vercel Blob', restErr)
-      return false
-    }
+    console.warn('Vercel Blob delete error:', err)
+    return false
   }
 }
 

@@ -12,6 +12,10 @@ import SuperSimulator from '../simulations/SuperSimulator'
 import MemorySimulator from '../simulations/MemorySimulator'
 import OsSimulator from '../simulations/OsSimulator'
 import QuantumSimulator from '../simulations/QuantumSimulator'
+import SoftwareClassificationSimulator from '../simulations/SoftwareClassificationSimulator'
+import LanguageProcessorSimulator from '../simulations/LanguageProcessorSimulator'
+import TranslationPipelineSimulator from '../simulations/TranslationPipelineSimulator'
+import DeviceDriverSimulator from '../simulations/DeviceDriverSimulator'
 import { useApp } from '../context/AppContext'
 import { Cpu, Database } from 'lucide-react'
 
@@ -26,7 +30,12 @@ const simulatorMap = {
   memory: MemorySimulator,
   os: OsSimulator,
   quantum: QuantumSimulator,
+  'software-class': SoftwareClassificationSimulator,
+  'lang-processor': LanguageProcessorSimulator,
+  'translation-pipeline': TranslationPipelineSimulator,
+  'device-driver': DeviceDriverSimulator,
 }
+
 
 export default function Simulations() {
   const { id } = useParams()

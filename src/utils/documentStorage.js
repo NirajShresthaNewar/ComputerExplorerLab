@@ -182,18 +182,24 @@ export async function getDocuments(folderId = null) {
 }
 
 export async function uploadDocument(file, folderId = 'class-3-math') {
-  const buffer = await file.arrayBuffer()
   const mimeType = file.type || getFallbackFileType(file.name)
   let cloudInfo = null
 
-  // If Vercel Blob token is configured, upload directly to Vercel Blob cloud
+  // Trigger Vercel Blob cloud upload instantly without waiting for arrayBuffer conversion
   if (isVercelBlobConfigured()) {
     try {
       cloudInfo = await uploadToVercelBlob(file)
     } catch (err) {
       console.warn('Vercel Blob upload failed, falling back to local storage:', err)
-      // Continue to local storage fallback
     }
+  }
+
+  // Generate buffer for local storage / offline caching
+  let buffer = null
+  try {
+    buffer = await file.arrayBuffer()
+  } catch (e) {
+    console.warn('Could not read array buffer for local cache', e)
   }
 
   const doc = {
@@ -202,7 +208,7 @@ export async function uploadDocument(file, folderId = 'class-3-math') {
     name: file.name,
     type: mimeType,
     size: file.size,
-    buffer, // Keep buffer for local fallback/offline view
+    buffer,
     storedIn: cloudInfo ? 'vercel-blob' : 'local',
     url: cloudInfo ? cloudInfo.url : null,
     downloadUrl: cloudInfo ? cloudInfo.downloadUrl : null,
@@ -233,7 +239,7 @@ export async function uploadDocument(file, folderId = 'class-3-math') {
 
   return {
     ...doc,
-    blob: new Blob([buffer], { type: mimeType }),
+    blob: buffer ? new Blob([buffer], { type: mimeType }) : new Blob([''], { type: mimeType }),
   }
 }
 
