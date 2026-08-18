@@ -12,43 +12,41 @@ export default function MultiplicationTables() {
     }
   }
 
-  const selectAll = () => setSelectedTables([1, 2, 3, 4, 5, 6, 7, 8, 9])
+  const selectAll = () => setSelectedTables([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15])
   const clearAll = () => setSelectedTables([])
 
   return (
     <div className="bg-white/95 backdrop-blur-sm rounded-3xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/20 h-[700px] flex">
-      
+
       {/* Sidebar */}
-      <div 
-        className={`bg-gray-50 border-r border-gray-200 transition-all duration-300 flex flex-col ${
-          sidebarOpen ? 'w-64' : 'w-0 opacity-0 overflow-hidden'
-        }`}
+      <div
+        className={`bg-gray-50 border-r border-gray-200 transition-all duration-300 flex flex-col ${sidebarOpen ? 'w-64' : 'w-0 opacity-0 overflow-hidden'
+          }`}
       >
         <div className="p-4 border-b border-gray-200 flex justify-between items-center bg-blue-50">
           <h3 className="font-bold text-blue-900">Select Tables</h3>
-          <button 
+          <button
             onClick={() => setSidebarOpen(false)}
             className="text-gray-400 hover:text-gray-600 lg:hidden"
           >
             ✕
           </button>
         </div>
-        
+
         <div className="p-4 flex gap-2 border-b border-gray-200">
           <button onClick={selectAll} className="text-xs font-semibold px-2 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200">All</button>
           <button onClick={clearAll} className="text-xs font-semibold px-2 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">Clear</button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-2">
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
-            <label 
-              key={num} 
-              className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-colors ${
-                selectedTables.includes(num) ? 'bg-blue-100 border border-blue-200' : 'bg-white border border-gray-100 hover:bg-gray-50'
-              }`}
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map(num => (
+            <label
+              key={num}
+              className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-colors ${selectedTables.includes(num) ? 'bg-blue-100 border border-blue-200' : 'bg-white border border-gray-100 hover:bg-gray-50'
+                }`}
             >
-              <input 
-                type="checkbox" 
+              <input
+                type="checkbox"
                 checked={selectedTables.includes(num)}
                 onChange={() => toggleTable(num)}
                 className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
@@ -63,7 +61,7 @@ export default function MultiplicationTables() {
       <div className="flex-1 flex flex-col h-full bg-slate-50 relative">
         <div className="p-4 border-b border-gray-200 flex items-center gap-4 bg-white">
           {!sidebarOpen && (
-            <button 
+            <button
               onClick={() => setSidebarOpen(true)}
               className="px-3 py-1.5 bg-blue-100 text-blue-700 font-medium rounded-lg hover:bg-blue-200 transition-colors"
             >
